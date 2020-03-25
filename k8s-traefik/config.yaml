@@ -1,0 +1,46 @@
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: traefik-config
+  namespace: ingress-traefik
+data:
+  traefik.yaml: |-
+    ping: ""                    ## 啟用 Ping
+    serversTransport:
+      insecureSkipVerify: true  ## Traefik 忽略驗證代理服務的 TLS 證書
+    api:
+      insecure: true            ## 允許 HTTP 方式訪問 API
+      dashboard: true           ## 啟用 Dashboard
+      debug: false              ## 啟用 Debug 調試模式
+    metrics:
+      prometheus: ""            ## 配置 Prometheus 監控指標數據，並使用默認配置
+    entryPoints:
+      web:
+        address: ":80"          ## 配置 80 端口，並設置入口名稱為 web
+      websecure:
+        address: ":443"         ## 配置 443 端口，並設置入口名稱為 websecure
+    providers:
+      kubernetesCRD: ""         ## 啟用 Kubernetes CRD 方式來配置路由規則
+      kubernetesIngress: ""     ## 啟動 Kubernetes Ingress 方式來配置路由規則
+    log:
+      filePath: ""              ## 設置調試日誌文件存儲路徑，如果為空則輸出到控制台
+      level: error              ## 設置調試日誌級別
+      format: json              ## 設置調試日誌格式
+    accessLog:
+      filePath: ""              ## 設置訪問日誌文件存儲路徑，如果為空則輸出到控制台
+      format: json              ## 設置訪問調試日誌格式
+      bufferingSize: 0          ## 設置訪問日誌緩存行數
+      filters:
+        #statusCodes: ["200"]   ## 設置只保留指定狀態碼範圍內的訪問日誌
+        retryAttempts: true     ## 設置代理訪問重試失敗時，保留訪問日誌
+        minDuration: 20         ## 設置保留請求時間超過指定持續時間的訪問日誌
+      fields:                   ## 設置訪問日誌中的字段是否保留（keep 保留、drop 不保留）
+        defaultMode: keep       ## 設置默認保留訪問日誌字段
+        names:                  ## 針對訪問日誌特別字段特別配置保留模式
+          ClientUsername: drop  
+        headers:                ## 設置 Header 中字段是否保留
+          defaultMode: keep     ## 設置默認保留 Header 中字段
+          names:                ## 針對 Header 中特別字段特別配置保留模式
+            User-Agent: redact
+            Authorization: drop
+            Content-Type: keep
