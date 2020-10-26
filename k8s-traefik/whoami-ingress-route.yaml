@@ -19,6 +19,7 @@ spec:
     priority: 12
     services:
     - name: whoami
+      namespace: dafault
       port: 80
       # (default 1) A weight used by the weighted round-robin strategy (WRR).
       weight: 1
